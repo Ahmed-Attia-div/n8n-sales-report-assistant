@@ -67,22 +67,23 @@ Sends:
 
 Recommended folder layout:
 
+```
 /
 │── README.md
 │── LICENSE
 │
 ├── workflow/
-│ └── sales-report-workflow.json
+│   └── sales-report-workflow.json
 │
 ├── images/
-│ ├── workflow-canvas.png
-│ ├── gemini-node.png
-│ ├── gmail-template.png
-│ └── sample-email.png
+│   ├── workflow-canvas.png
+│   ├── gemini-node.png
+│   ├── gmail-template.png
+│   └── sample-email.png
 │
 └── data/ (optional)
-└── sample-sales-data.csv
-
+    └── sample-sales-data.csv
+```
 
 ---
 
