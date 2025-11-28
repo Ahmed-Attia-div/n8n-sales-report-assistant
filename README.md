@@ -1,7 +1,4 @@
 # n8n-sales-report-assistant
-Chat-driven n8n workflow that aggregates sales data, generates charts, and sends a narrative email report.
-
-n8n Sales Report Assistant
 Automated n8n workflow that analyzes sales data with Gemini, generates charts, and sends a visual email summary.
 The workflow turns a simple chat-style question (like “What is the sales for the West region?”) into an AI-written report with line, bar, and pie charts embedded in an HTML email.
 
