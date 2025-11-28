@@ -68,8 +68,8 @@ Sends:
 Recommended folder layout:
 
 /
-│ README.md
-│ LICENSE
+│── README.md
+│── LICENSE
 │
 ├── workflow/
 │ └── sales-report-workflow.json
@@ -82,9 +82,6 @@ Recommended folder layout:
 │
 └── data/ (optional)
 └── sample-sales-data.csv
-
-markdown
-Copy code
 
 
 ---
