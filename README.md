@@ -1,53 +1,155 @@
-# n8n-sales-report-assistant
-Automated n8n workflow that analyzes sales data with Gemini, generates charts, and sends a visual email summary.
-The workflow turns a simple chat-style question (like “What is the sales for the West region?”) into an AI-written report with line, bar, and pie charts embedded in an HTML email.
+# n8n Sales Report Assistant
 
-Features
-Chat-style input to request specific sales insights (e.g. by region, category, or time period).
+An automated n8n workflow that analyzes sales data using the Gemini API, generates charts via QuickChart, and sends a complete HTML email report containing AI-generated insights and visualizations.
 
-Automatic aggregation of sales data from a spreadsheet (Google Sheets or CSV via n8n).
+This workflow turns a simple chat-style question such as **“What are the total sales in the West region?”** into a fully formatted report containing:
 
-Generation of line, bar, and pie charts using QuickChart image URLs.
+- 📊 Line, bar, and pie charts  
+- 🧠 Gemini-written narrative summary  
+- 📩 Automatically emailed HTML report  
 
-Gemini-powered narrative summary describing totals, averages, best and worst performers.
+---
 
-HTML email report sent through Gmail with charts and written commentary.
+## 🚀 Features
 
-Workflow overview
-The workflow consists of several nodes executed in sequence:
+- **Chat-style inputs** — ask questions about regions, product categories, periods, etc.
+- **Automatic data aggregation** from Google Sheets or CSV.
+- **QuickChart visualization** (line, bar, pie) using generated image URLs.
+- **Gemini AI summary** with totals, averages, highest/lowest performers, and commentary.
+- **Stylish HTML email report** sent directly via Gmail.
+- **Reusable + customizable prompts and chart templates.**
 
-Trigger / Chat input
+---
 
-Starts the workflow when a chat message or manual execution is received.
+## 🧩 Workflow Overview (Node by Node)
 
-Data Analyst (AI Agent)
+The workflow consists of these main nodes:
 
-Interprets the user’s request.
+### 1. **Trigger / Chat Input**
+Starts execution through manual trigger, webhook, schedule, or chat-like input.
 
-Selects the right filters (e.g. region = “West”) and prepares two arrays: labels and numeric values.
+### 2. **Data Analyst (Gemini / AI Agent)**
+- Understands the user question  
+- Determines filters  
+- Outputs:
+  - `labels[]`
+  - `values[]`
 
-Clean Data
+### 3. **Clean Data**
+- Formats and sanitizes the arrays  
+- Prepares them for chart URL generation and summary writing
 
-Cleans and formats labels and values into a structure that can be passed to the reporting model and chart URLs.
+### 4. **Write Report (Gemini)**
+- Receives `labels` and `values`
+- Produces a professional English summary (JSON)
+- Includes:
+  - Total  
+  - Average  
+  - Best / worst performer  
+  - Short insights
 
-Write Report (Gemini)
+### 5. **Write HTML**
+- Builds QuickChart URLs:
+  - Line chart  
+  - Bar chart  
+  - Pie chart  
+- Combines everything into a JSON payload ready for Gmail
 
-Receives the labels and values arrays.
+### 6. **Gmail: Send a Message**
+Sends:
+- Gemini summary
+- 3 chart images
+- Beautiful HTML layout
 
-Produces a concise, professional English summary (totals, averages, highest/lowest performer, and brief commentary).
+---
 
-Write HTML
+## 📁 Repository Structure
 
-Builds QuickChart URLs for line, bar, and pie charts using the cleaned data.
+Recommended folder layout:
 
-Combines chart URLs and the Gemini summary into a single JSON object ready for email.
+/
+│ README.md
+│ LICENSE
+│
+├── workflow/
+│ └── sales-report-workflow.json
+│
+├── images/
+│ ├── workflow-canvas.png
+│ ├── gemini-node.png
+│ ├── gmail-template.png
+│ └── sample-email.png
+│
+└── data/ (optional)
+└── sample-sales-data.csv
 
-Gmail: Send a message
+markdown
+Copy code
 
-Uses an HTML template that embeds:
+---
 
-The Gemini summary.
+## 📸 Screenshots
 
-The three chart images (line, bar, pie).
+You may add screenshots for better documentation:
 
-Sends the final email report to the configured recipient.
+- **Workflow overview:** `images/workflow-canvas.png`
+- **Gemini node:** `images/gemini-node.png`
+- **Gmail template:** `images/gmail-template.png`
+- **Final email:** `images/sample-email.png`
+
+To embed images in your GitHub README later, use:
+
+```markdown
+![Workflow Overview](images/workflow-canvas.png)
+---
+```
+## ⚙️ Setup
+
+### **Prerequisites**
+Before importing the workflow, make sure you have:
+
+- n8n (cloud or self-hosted)
+- Google Sheets data source **or** CSV file
+- Gmail API credentials configured in n8n
+- Gemini API access (Google AI Studio / PaLM)
+- QuickChart (no account required)
+
+---
+
+## 🔧 Installation Steps
+
+1. **Clone this repository**
+
+```bash
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+```
+
+2. **Import the workflow into n8n**
+In n8n:
+Menu → Import from File → select:
+
+workflow/sales-report-workflow.json
+
+
+3. **Configure necessary credentials in n8n**
+
+Google Sheets (or CSV reading node)
+
+Gemini API (for Data Analyst + Write Report nodes)
+
+Gmail API (for sending the email)
+
+4. **Update workflow parameters**
+
+Spreadsheet ID or CSV path
+
+Email recipient
+
+Any environment variables
+
+Prompts (optional)
+
+5. **Activate the workflow**
+Test with a question such as:
+
+“What is the sales for the West region?”
