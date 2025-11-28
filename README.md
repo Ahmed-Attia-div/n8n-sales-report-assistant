@@ -63,27 +63,6 @@ Sends:
 
 ---
 
-## 📁 Repository Structure
-
-Recommended folder layout:
-
-```
-/
-│── README.md
-│── LICENSE
-│
-├── workflow/
-│   └── sales-report-workflow.json
-│
-├── images/
-│   ├── workflow-canvas.png
-│   ├── gemini-node.png
-│   ├── gmail-template.png
-│   └── sample-email.png
-│
-└── data/ (optional)
-    └── sample-sales-data.csv
-```
 
 ---
 
@@ -91,15 +70,13 @@ Recommended folder layout:
 
 You may add screenshots for better documentation:
 
-- **Workflow overview:** `images/workflow-canvas.png`
-- **Gemini node:** `images/gemini-node.png`
-- **Gmail template:** `images/gmail-template.png`
-- **Final email:** `images/sample-email.png`
+- **Workflow overview:** `workflow-canvas.png`
+- **Final email:** `sample-email.png`
 
 To embed images in your GitHub README later, use:
 
 ```markdown
-![Workflow Overview](images/workflow-canvas.png)
+![Workflow Overview](workflow-canvas.png)
 ---
 ```
 ## ⚙️ Setup
@@ -120,14 +97,14 @@ Before importing the workflow, make sure you have:
 1. **Clone this repository**
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+git clone https://github.com/Ahmed-Attia-div/n8n-sales-report-assistant.git
 ```
 
 2. **Import the workflow into n8n**
 In n8n:
 Menu → Import from File → select:
 
-workflow/sales-report-workflow.json
+workflow/AI Data Analyst.json
 
 
 3. **Configure necessary credentials in n8n**
@@ -151,4 +128,4 @@ Prompts (optional)
 5. **Activate the workflow**
 Test with a question such as:
 
-“What is the sales for the West region?”
+“What is the sales for categories in the south region?”
