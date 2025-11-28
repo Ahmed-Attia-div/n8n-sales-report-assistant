@@ -1,0 +1,286 @@
+{
+  "name": "Data Analyst",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        112
+      ],
+      "id": "c86728fd-f7c0-4590-bb45-159926ad0c4d",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "aboelnagaahmedattia@gmail.com",
+        "subject": "Data Analysis",
+        "message": "=<div style=\"font-family: Arial, sans-serif; color: #333;\"> <h2>📊 Data Analysis Summary</h2> <div style=\"background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; padding: 12px 15px; margin-bottom: 20px; font-size: 0.95em; line-height: 1.5;\"> {{ $(\"Write Report\").item.json.content.parts.text }} </div> <table cellspacing=\"10\" cellpadding=\"0\" border=\"0\" style=\"width: 100%;\"> <tr> <td align=\"center\" valign=\"top\" style=\"width: 33%;\"> <h3>📈 Line Chart</h3> <img src=\"{{ $json.chartLineUrl }}\" style=\"max-width: 100%; border: 1px solid #ddd; border-radius: 4px;\"> </td> <td align=\"center\" valign=\"top\" style=\"width: 33%;\"> <h3>📊 Bar Chart</h3> <img src=\"{{ $json.chartBarUrl }}\" style=\"max-width: 100%; border: 1px solid #ddd; border-radius: 4px;\"> </td> <td align=\"center\" valign=\"top\" style=\"width: 33%;\"> <h3>🧩 Pie Chart</h3> <img src=\"{{ $json.chartPieUrl }}\" style=\"max-width: 100%; border: 1px solid #ddd; border-radius: 4px;\"> </td> </tr> </table> <p style=\"font-size: 0.9em; color: #888;\">Generated automatically by your AI analysis assistant 🚀</p> </div>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1680,
+        -112
+      ],
+      "id": "59df9671-a416-42ca-b58f-0c3a5f2d738b",
+      "name": "Send a message",
+      "webhookId": "03d6f4d7-9ade-4ec8-bfb3-64112a36c179",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WIzVyVJ2DofHajvG",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a data visualization assistant.\n\nThe user will give a request like:\n- \"Show revenue per month as a line chart for 2024\"\n- \"Show number of sold units per product\"\n- \"Give me the sales for region North\"\n\nYour task:\n1. Select the right data filters (like year, product, region) based on the user’s request.\n2. Prepare two arrays: one for labels and one for numeric values.\n3. Always return **only** a valid JSON object (no markdown, no explanations, no code block).\n\nYou must return valid JSON only, without any markdown, prefix, backticks, or extra text.\nExample output:\n{\"labels\": [\"...\"], \"values\": [123, 456]}\n\nDo not include any explanations or formatting.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -112
+      ],
+      "id": "f30d430a-2cee-4864-bbe9-38e3f7be2765",
+      "name": "Data Analyst"
+    },
+    {
+      "parameters": {
+        "jsCode": "let rawOutput = items[0].json.output;\n\n\nrawOutput = rawOutput.replace(/```json\\s*|\\s*```/g, '');  \nrawOutput = rawOutput.replace(/^json\\s*/, '');           \n\n\nlet parsed = {};\ntry {\n  const firstParse = JSON.parse(rawOutput);\n  if (typeof firstParse === 'string') {\n    parsed = JSON.parse(firstParse);\n  } else {\n    parsed = firstParse;\n  }\n} catch (err) {\n  throw new Error('Failed to parse AI Agent output as JSON: ' + err.message);\n}\n\n\nreturn [\n  {\n    json: {\n      labels: parsed.labels ?? [],\n      values: parsed.values ?? []\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        -112
+      ],
+      "id": "5794ce45-69c1-4db8-90d8-b99f4afc808a",
+      "name": "Clean Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const labels = $('Clean Data').first().json.labels;\nconst values = $('Clean Data').first().json.values;\n\n// Ensure arrays are valid\nconst cleanedLabels = labels.map(l => String(l));\nconst cleanedValues = values.map(v => Number(v));\n\n// Configs:\nconst configLine = {\n  type: 'line',\n  data: {\n    labels: cleanedLabels,\n    datasets: [{\n      label: 'Amount',\n      data: cleanedValues,\n      borderWidth: 3,\n      pointStyle: 'circle'\n    }]\n  },\n  options: {\n    scales: {\n      y: { beginAtZero: true }\n    }\n  }\n};\n\nconst configBar = {\n  type: 'bar',\n  data: {\n    labels: cleanedLabels,\n    datasets: [{\n      label: 'Amount',\n      data: cleanedValues,\n      borderWidth: 3\n    }]\n  },\n  options: {\n    scales: {\n      y: { beginAtZero: true }\n    }\n  }\n};\n\nconst configPie = {\n  type: 'pie',\n  data: {\n    labels: cleanedLabels,\n    datasets: [{\n      label: 'Amount',\n      data: cleanedValues\n    }]\n  }\n};\n\n// Encode URLs\nconst chartLineUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(configLine))}`;\nconst chartBarUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(configBar))}`;\nconst chartPieUrl = `https://quickchart.io/chart?c=${encodeURIComponent(JSON.stringify(configPie))}`;\n\n// Return result\nreturn [{\n  json: {\n    ...items[0].json,\n    chartLineUrl,\n    chartBarUrl,\n    chartPieUrl\n  }\n}];\n\n\n\n\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        -112
+      ],
+      "id": "bf5a1b37-6d58-46ea-a4e6-6c6bec442e35",
+      "name": "Write HTML"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        -112
+      ],
+      "id": "e93492b6-f895-4c60-90fd-95f793a773b9",
+      "name": "When chat message received",
+      "webhookId": "85c290ce-bc5d-4ee9-9d7e-ed12c09359d3"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        448,
+        112
+      ],
+      "id": "5aecde8d-e6fc-423a-a880-9bb7143be1e4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1CyCDoAEquycivmN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1re0IwPvW9uNMw73FmQA6U6bnCDJuDQ4qFuQQR6XJlXQ",
+          "mode": "list",
+          "cachedResultName": "SuperSales",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1re0IwPvW9uNMw73FmQA6U6bnCDJuDQ4qFuQQR6XJlXQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 432002520,
+          "mode": "list",
+          "cachedResultName": "Superstore Sales Dataset",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1re0IwPvW9uNMw73FmQA6U6bnCDJuDQ4qFuQQR6XJlXQ/edit#gid=432002520"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        160
+      ],
+      "id": "0c60392b-e41c-4a2b-8a53-49d221b1ff0b",
+      "name": "getData",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ChXNH7jaZ7DkdL3p",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('When chat message received').item.json.chatInput }}\n{{ $('Data Analyst').item.json.output }}"
+            },
+            {
+              "content": "You are a professional data analyst assistant.\n\nYou will receive two arrays:\n1️⃣ An array of item labels (e.g. product names)\n2️⃣ An array of numeric values (e.g. sales or profit figures for those products).\n\nYour task is to analyze this dataset and generate a clear, natural-language summary suitable for inclusion in a professional email.\n\nYour summary must:\n- Begin with a general overview of how many items were analyzed and the total and average value\n- Identify and name the highest-performing item and its value\n- Identify and name the lowest-performing item and its value\n- Comment briefly on any noticeable spread, disparity, or distribution in performance\n- Optionally suggest that further review might be needed if there’s a large gap between top and bottom performers\n\nStyle:\n- Professional, polished English\n- 3-5 concise sentences\n- No formatting, markdown, or bullet points — plain text only\n\nExample style:\n\"The dataset includes 4 products, generating a total profit of €33,343.50 and an average of €8,335.88 per item. Widget D delivered the highest profit at €13,362.26, while Widget C contributed the least at €4,303.67. There is a significant performance gap between these products, suggesting that Widget D is a key driver of profitability while Widget C may require closer analysis.\"\n\nDo NOT output JSON or any technical data structures — plain English narrative only.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        -80
+      ],
+      "id": "fd2c08b1-e5da-44dd-abeb-bbabf8b5a4da",
+      "name": "Write Report",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1CyCDoAEquycivmN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Data Analyst",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Analyst": {
+      "main": [
+        [
+          {
+            "node": "Clean Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Data": {
+      "main": [
+        [
+          {
+            "node": "Write Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write HTML": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Data Analyst",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Data Analyst",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getData": {
+      "ai_tool": [
+        [
+          {
+            "node": "Data Analyst",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Report": {
+      "main": [
+        [
+          {
+            "node": "Write HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70a88146-9d3d-406f-8b3a-b02de6acfa01",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cbfc961324802a44cf58ca8046d7fe2170f385912aa48ed765a95621f387cafb"
+  },
+  "id": "nRnIB85GFSkruBXH",
+  "tags": []
+}
