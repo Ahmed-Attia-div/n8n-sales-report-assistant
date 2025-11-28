@@ -70,15 +70,13 @@ Sends:
 
 You may add screenshots for better documentation:
 
-- **Workflow overview:** `workflow-canvas.png`
-- **Final email:** `sample-email.png`
+- **Workflow overview:**  
+  ![Workflow overview](workflow-canvas.png)
 
-To embed images in your GitHub README later, use:
+- **Final email:**  
+  ![Final email](sample-email.png)
 
-```markdown
-![Workflow Overview](workflow-canvas.png)
----
-```
+
 ## ⚙️ Setup
 
 ### **Prerequisites**
